@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voice Agent -- Day 9</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>🎙️ Voice Agent -- Day 9</h1>
+      <p>
+        <strong>Revolutionary Voice-to-Voice AI Conversation!</strong><br />
+        Record your voice → AI transcribes → Gemini generates response → AI
+        speaks back to you!<br />
+        <strong>Backend:</strong> FastAPI | <strong>Frontend:</strong> HTML +
+        CSS + JS
+      </p>
+
+      <!-- Text to Speech Section -->
+      <div class="section">
+        <h2>Text to Speech</h2>
+        <!-- Text input field -->
+        <input
+          type="text"
+          id="textInput"
+          placeholder="Enter text to convert to speech"
+        />
+
+        <!-- Voice selection -->
+        <select id="voiceSelect" class="voice-select">
+          <option value="en-US-natalie">Natalie (US Female)</option>
+          <option value="en-US-marcus">Marcus (US Male)</option>
+          <option value="en-US-charlotte">Charlotte (US Female)</option>
+          <option value="en-US-davis">Davis (US Male)</option>
+          <option value="en-GB-amelia">Amelia (UK Female)</option>
+          <option value="en-GB-oliver">Oliver (UK Male)</option>
+        </select>
+
+        <!-- Button to trigger fetch -->
+        <button onclick="generateAudio()">🔊 Generate Audio</button>
+
+        <!-- Audio player -->
+        <audio
+          id="audioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+      </div>
+
+      <!-- Voice-to-Voice AI Conversation Section -->
+      <div class="section voice-conversation">
+        <h2>🗣️ Voice-to-Voice AI Conversation</h2>
+        <p>
+          <strong>Talk to AI naturally!</strong> Record your question, and AI
+          will respond with voice. Perfect for hands-free conversations,
+          language practice, and accessibility.
+        </p>
+
+        <!-- Voice selection for AI response -->
+        <div class="conversation-voice-selection">
+          <label for="conversationVoiceSelect">AI Response Voice:</label>
+          <select id="conversationVoiceSelect" class="voice-select">
+            <option value="en-US-natalie">Natalie (US Female)</option>
+            <option value="en-US-marcus">Marcus (US Male)</option>
+            <option value="en-US-charlotte">Charlotte (US Female)</option>
+            <option value="en-US-davis">Davis (US Male)</option>
+            <option value="en-GB-amelia">Amelia (UK Female)</option>
+            <option value="en-GB-oliver">Oliver (UK Male)</option>
+          </select>
+        </div>
+
+        <!-- LLM settings for conversation -->
+        <div class="conversation-settings">
+          <label for="conversationMaxTokens">Max Tokens:</label>
+          <input
+            type="number"
+            id="conversationMaxTokens"
+            value="800"
+            min="100"
+            max="3000"
+            style="width: 80px; margin: 0 10px"
+          />
+
+          <label for="conversationTemperature">Temperature:</label>
+          <input
+            type="number"
+            id="conversationTemperature"
+            value="0.7"
+            min="0"
+            max="2"
+            step="0.1"
+            style="width: 80px; margin: 0 10px"
+          />
+        </div>
+
+        <!-- Recording controls for conversation -->
+        <div class="conversation-controls">
+          <button id="startConversation" onclick="startConversationRecording()">
+            🎙️ Start Recording Question
+          </button>
+          <button
+            id="stopConversation"
+            onclick="stopConversationRecording()"
+            disabled
+          >
+            ⏹️ Stop & Get AI Response
+          </button>
+        </div>
+
+        <!-- Conversation status -->
+        <div id="conversationStatus" class="status"></div>
+
+        <!-- Original question audio player -->
+        <audio
+          id="conversationAudioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+
+        <!-- AI Response Section -->
+        <div id="aiResponseSection" style="display: none; margin-top: 20px">
+          <h4>🤖 AI Response:</h4>
+          <div id="aiResponseText" class="ai-response-text"></div>
+          <div id="aiResponseAudio" class="ai-response-audio"></div>
+        </div>
+
+        <!-- Conversation results -->
+        <div
+          id="conversationResults"
+          class="conversation-results"
+          style="display: none"
+        >
+          <h3>💬 Conversation Details</h3>
+          <div
+            id="conversationTranscript"
+            class="conversation-transcript"
+          ></div>
+          <div id="conversationDetails" class="conversation-details"></div>
+        </div>
+      </div>
+
+      <!-- LLM Text Query Section -->
+      <div class="section">
+        <h2>🧠 AI Text Generation</h2>
+        <p>Ask any question or give any prompt to Google Gemini AI!</p>
+
+        <!-- Query input -->
+        <textarea
+          id="llmQueryInput"
+          placeholder="Ask me anything or give me a task..."
+          rows="3"
+          style="
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+          "
+        ></textarea>
+
+        <!-- LLM settings -->
+        <div class="llm-settings">
+          <label for="maxTokens">Max Tokens:</label>
+          <input
+            type="number"
+            id="maxTokens"
+            value="1000"
+            min="100"
+            max="4000"
+            style="width: 80px; margin: 0 10px"
+          />
+
+          <label for="temperature">Temperature:</label>
+          <input
+            type="number"
+            id="temperature"
+            value="0.7"
+            min="0"
+            max="2"
+            step="0.1"
+            style="width: 80px; margin: 0 10px"
+          />
+        </div>
+
+        <!-- Generate button -->
+        <button onclick="generateLLMResponse()" style="margin-top: 10px">
+          ✨ Generate AI Response
+        </button>
+
+        <!-- LLM status -->
+        <div id="llmStatus" class="status"></div>
+
+        <!-- LLM results -->
+        <div id="llmResults" class="llm-results" style="display: none">
+          <h3>🤖 AI Response</h3>
+          <div id="llmResponse" class="llm-response"></div>
+          <div id="llmDetails" class="llm-details"></div>
+        </div>
+      </div>
+
+      <!-- AI Echo Bot Section -->
+      <div class="section">
+        <h2>🤖 AI Echo Bot</h2>
+        <p>
+          Record your voice and hear it back in an AI voice! Your speech is
+          transcribed and converted to AI speech.
+        </p>
+
+        <!-- Voice selection for echo -->
+        <div class="echo-voice-selection">
+          <label for="echoVoiceSelect">Echo Voice:</label>
+          <select id="echoVoiceSelect" class="voice-select">
+            <option value="en-US-natalie">Natalie (US Female)</option>
+            <option value="en-US-marcus">Marcus (US Male)</option>
+            <option value="en-US-charlotte">Charlotte (US Female)</option>
+            <option value="en-US-davis">Davis (US Male)</option>
+            <option value="en-GB-amelia">Amelia (UK Female)</option>
+            <option value="en-GB-oliver">Oliver (UK Male)</option>
+          </select>
+        </div>
+
+        <!-- Recording controls -->
+        <div class="recording-controls">
+          <button id="startRecording" onclick="startRecording()">
+            🎙️ Start Recording
+          </button>
+          <button id="stopRecording" onclick="stopRecording()" disabled>
+            ⏹️ Stop Recording
+          </button>
+          <button id="aiEcho" onclick="aiEcho()" disabled style="display: none">
+            🤖 AI Echo
+          </button>
+          <button
+            id="uploadRecording"
+            onclick="uploadRecording()"
+            disabled
+            style="display: none"
+          >
+            📤 Upload Recording
+          </button>
+          <button
+            id="transcribeRecording"
+            onclick="transcribeRecording()"
+            disabled
+            style="display: none"
+          >
+            📝 Transcribe Audio
+          </button>
+        </div>
+
+        <!-- Recording status -->
+        <div id="recordingStatus" class="status"></div>
+
+        <!-- AI Echo status -->
+        <div id="aiEchoStatus" class="status"></div>
+
+        <!-- Upload status -->
+        <div id="uploadStatus" class="status"></div>
+
+        <!-- Transcription status -->
+        <div id="transcriptionStatus" class="status"></div>
+
+        <!-- Original audio player -->
+        <audio
+          id="recordedAudioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+
+        <!-- AI Echo audio player -->
+        <div id="echoAudioSection" style="display: none; margin-top: 20px">
+          <h4>🔊 AI Echo Result:</h4>
+          <audio id="echoAudioPlayer" controls style="width: 100%"></audio>
+        </div>
+
+        <!-- Upload info display -->
+        <div id="uploadInfo" class="upload-info" style="display: none">
+          <h3>📋 Upload Details</h3>
+          <div id="uploadDetails"></div>
+        </div>
+
+        <!-- Transcription results -->
+        <div
+          id="transcriptionResults"
+          class="transcription-results"
+          style="display: none"
+        >
+          <h3>📄 Transcription Results</h3>
+          <div id="transcriptionText" class="transcription-text"></div>
+          <div id="transcriptionDetails" class="transcription-details"></div>
+        </div>
+
+        <!-- AI Echo results -->
+        <div id="echoResults" class="echo-results" style="display: none">
+          <h3>🤖 AI Echo Results</h3>
+          <div id="echoTranscript" class="echo-transcript"></div>
+          <div id="echoDetails" class="echo-details"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link to JS file -->
+    <script src="/static/script.js"></script>
+  </body>
+</html>

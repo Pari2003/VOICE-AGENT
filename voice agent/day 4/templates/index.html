@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voice Agent -- Day 4</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>🎙️ Voice Agent -- Day 4</h1>
+      <p>
+        Playing back TTS audio using <em>Murf API</em>.<br />
+        <strong>Backend:</strong> Flask | <strong>Frontend:</strong> HTML + CSS
+        + JS
+      </p>
+
+      <!-- Text to Speech Section -->
+      <div class="section">
+        <h2>Text to Speech</h2>
+        <!-- Text input field -->
+        <input
+          type="text"
+          id="textInput"
+          placeholder="Enter text to convert to speech"
+        />
+
+        <!-- Button to trigger fetch -->
+        <button onclick="generateAudio()">🔊 Generate Audio</button>
+
+        <!-- Audio player -->
+        <audio
+          id="audioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+      </div>
+
+      <!-- Echo Bot Section -->
+      <div class="section">
+        <h1>🎤 Echo Bot</h1>
+        <p>Record your voice and play it back!</p>
+
+        <!-- Recording controls -->
+        <div class="recording-controls">
+          <button id="startRecording" onclick="startRecording()">
+            🎙️ Start Recording
+          </button>
+          <button id="stopRecording" onclick="stopRecording()" disabled>
+            ⏹️ Stop Recording
+          </button>
+        </div>
+
+        <!-- Recording status -->
+        <div id="recordingStatus" class="status"></div>
+
+        <!-- Audio player for recorded audio -->
+        <audio
+          id="recordedAudioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+      </div>
+    </div>
+
+    <!-- Link to JS file -->
+    <script src="/static/script.js"></script>
+  </body>
+</html>

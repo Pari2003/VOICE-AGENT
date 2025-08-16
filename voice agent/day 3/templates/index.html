@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voice Agent -- Day 3</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>🎙️ Voice Agent -- Day 3</h1>
+      <p>
+        Playing back TTS audio using <em>Murf API</em>.<br />
+        <strong>Backend:</strong> Flask | <strong>Frontend:</strong> HTML + CSS
+        + JS
+      </p>
+
+      <!-- Text input field -->
+      <input
+        type="text"
+        id="textInput"
+        placeholder="Enter text to convert to speech"
+      />
+
+      <!-- Button to trigger fetch -->
+      <button onclick="generateAudio()">🔊 Generate Audio</button>
+
+      <!-- Audio player -->
+      <audio
+        id="audioPlayer"
+        controls
+        style="display: none; margin-top: 15px"
+      ></audio>
+    </div>
+
+    <!-- Link to JS file -->
+    <script src="/static/script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+murf
+python-dotenv
+jinja2
+python-multipart
+aiofiles
+assemblyai

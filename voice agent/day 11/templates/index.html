@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voice Agent -- Day 11 - Robust Error Handling</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>🛡️ Voice Agent -- Day 11</h1>
+      <p>
+        <strong>Robust Conversational AI with Error Handling!</strong><br />
+        Enhanced with comprehensive error handling, fallback responses, and
+        service monitoring.<br />
+        <strong>Session ID:</strong> <span id="sessionDisplay">Loading...</span>
+        <button onclick="generateNewSession()" class="small-button">
+          🔄 New Chat
+        </button>
+        <button onclick="clearCurrentSession()" class="small-button">
+          🗑️ Clear History
+        </button>
+        <button onclick="checkSystemHealth()" class="small-button">
+          🏥 Health Check
+        </button>
+      </p>
+
+      <!-- System Health Status -->
+      <div id="healthStatus" class="health-status" style="display: none">
+        <h3>🏥 System Health</h3>
+        <div id="healthDetails" class="health-details"></div>
+      </div>
+
+      <!-- Error Alert Section -->
+      <div id="errorAlert" class="error-alert" style="display: none">
+        <h3>⚠️ System Alert</h3>
+        <div id="errorDetails" class="error-details"></div>
+        <button onclick="dismissError()" class="dismiss-button">
+          ✖ Dismiss
+        </button>
+      </div>
+
+      <!-- Conversational Chat Section -->
+      <div class="section conversation-section">
+        <h2>💬 Robust Conversational AI Chat</h2>
+        <p>
+          <strong
+            >Intelligent conversation with comprehensive error handling!</strong
+          ><br />
+          • Automatic retries for failed requests<br />
+          • Fallback audio responses for service issues<br />
+          • Real-time service health monitoring<br />
+          • Graceful degradation when services are unavailable
+        </p>
+
+        <!-- Chat settings -->
+        <div class="chat-settings">
+          <label for="chatVoiceSelect">AI Voice:</label>
+          <select id="chatVoiceSelect" class="voice-select">
+            <option value="en-US-natalie">Natalie (US Female)</option>
+            <option value="en-US-marcus">Marcus (US Male)</option>
+            <option value="en-US-charlotte">Charlotte (US Female)</option>
+            <option value="en-US-davis">Davis (US Male)</option>
+            <option value="en-GB-amelia">Amelia (UK Female)</option>
+            <option value="en-GB-oliver">Oliver (UK Male)</option>
+          </select>
+
+          <label for="chatMaxTokens">Max Tokens:</label>
+          <input
+            type="number"
+            id="chatMaxTokens"
+            value="600"
+            min="100"
+            max="2000"
+            style="width: 80px; margin: 0 10px"
+          />
+
+          <label for="chatTemperature">Temperature:</label>
+          <input
+            type="number"
+            id="chatTemperature"
+            value="0.7"
+            min="0"
+            max="2"
+            step="0.1"
+            style="width: 80px; margin: 0 10px"
+          />
+
+          <label for="enableRetries">Auto Retries:</label>
+          <input
+            type="checkbox"
+            id="enableRetries"
+            checked
+            style="margin: 0 10px"
+          />
+        </div>
+
+        <!-- Chat controls -->
+        <div class="chat-controls">
+          <button id="startChat" onclick="startChatRecording()">
+            🎙️ Start Conversation
+          </button>
+          <button id="stopChat" onclick="stopChatRecording()" disabled>
+            ⏹️ Stop & Send Message
+          </button>
+          <button
+            id="pauseConversation"
+            onclick="pauseConversation()"
+            disabled
+            style="display: none"
+          >
+            ⏸️ Pause Auto-Recording
+          </button>
+          <button
+            id="retryLastMessage"
+            onclick="retryLastMessage()"
+            disabled
+            style="display: none"
+          >
+            🔄 Retry Last Message
+          </button>
+        </div>
+
+        <!-- Chat status -->
+        <div id="chatStatus" class="status"></div>
+
+        <!-- Current recording audio player -->
+        <audio
+          id="chatAudioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+
+        <!-- Error Recovery Section -->
+        <div id="errorRecovery" class="error-recovery" style="display: none">
+          <h4>🔧 Error Recovery Options</h4>
+          <div id="recoveryOptions" class="recovery-options"></div>
+        </div>
+
+        <!-- Chat History Display -->
+        <div id="chatHistory" class="chat-history" style="display: none">
+          <h4>💬 Conversation History</h4>
+          <div id="chatMessages" class="chat-messages"></div>
+        </div>
+
+        <!-- AI Response Section -->
+        <div id="chatResponseSection" style="display: none; margin-top: 20px">
+          <h4>🤖 AI Response:</h4>
+          <div id="chatResponseText" class="chat-response-text"></div>
+          <div id="chatResponseAudio" class="chat-response-audio"></div>
+          <div
+            id="fallbackText"
+            class="fallback-text"
+            style="display: none"
+          ></div>
+        </div>
+
+        <!-- Chat session info -->
+        <div
+          id="chatSessionInfo"
+          class="chat-session-info"
+          style="display: none"
+        >
+          <h4>📊 Session Information</h4>
+          <div id="sessionDetails" class="session-details"></div>
+        </div>
+
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status">
+          <span id="connectionIndicator" class="connection-indicator"
+            >🟢 Connected</span
+          >
+          <span id="lastUpdate">Last update: Never</span>
+        </div>
+      </div>
+
+      <!-- Text to Speech Section -->
+      <div class="section">
+        <h2>🔊 Text to Speech (Robust)</h2>
+        <p>
+          Enhanced TTS with automatic fallback to text display if audio
+          generation fails.
+        </p>
+
+        <!-- Text input field -->
+        <input
+          type="text"
+          id="textInput"
+          placeholder="Enter text to convert to speech"
+        />
+
+        <!-- Voice selection -->
+        <select id="voiceSelect" class="voice-select">
+          <option value="en-US-natalie">Natalie (US Female)</option>
+          <option value="en-US-marcus">Marcus (US Male)</option>
+          <option value="en-US-charlotte">Charlotte (US Female)</option>
+          <option value="en-US-davis">Davis (US Male)</option>
+          <option value="en-GB-amelia">Amelia (UK Female)</option>
+          <option value="en-GB-oliver">Oliver (UK Male)</option>
+        </select>
+
+        <!-- Button to trigger fetch -->
+        <button onclick="generateAudio()">🔊 Generate Audio</button>
+
+        <!-- Audio player -->
+        <audio
+          id="audioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+
+        <!-- TTS Status and Fallback -->
+        <div id="ttsStatus" class="status"></div>
+        <div id="ttsFallback" class="tts-fallback" style="display: none">
+          <h4>📝 Text Fallback (Audio generation failed)</h4>
+          <div id="ttsText" class="tts-text"></div>
+        </div>
+      </div>
+
+      <!-- System Diagnostics Section -->
+      <div class="section diagnostics-section">
+        <h2>🔧 System Diagnostics</h2>
+        <p>Monitor service health and troubleshoot connection issues.</p>
+
+        <div class="diagnostics-controls">
+          <button onclick="runDiagnostics()">🔍 Run Full Diagnostics</button>
+          <button onclick="testSTT()">🎤 Test Speech-to-Text</button>
+          <button onclick="testLLM()">🧠 Test AI Response</button>
+          <button onclick="testTTS()">🔊 Test Text-to-Speech</button>
+        </div>
+
+        <div
+          id="diagnosticsResults"
+          class="diagnostics-results"
+          style="display: none"
+        >
+          <h4>📋 Diagnostic Results</h4>
+          <div id="diagnosticsDetails" class="diagnostics-details"></div>
+        </div>
+      </div>
+
+      <!-- Legacy Features (with error handling) -->
+      <div class="section">
+        <h2>🎙️ Single Voice Query (Robust)</h2>
+        <p>
+          Single question-answer with enhanced error handling and fallback
+          responses.
+        </p>
+
+        <!-- Voice selection for AI response -->
+        <div class="conversation-voice-selection">
+          <label for="conversationVoiceSelect">AI Response Voice:</label>
+          <select id="conversationVoiceSelect" class="voice-select">
+            <option value="en-US-natalie">Natalie (US Female)</option>
+            <option value="en-US-marcus">Marcus (US Male)</option>
+            <option value="en-US-charlotte">Charlotte (US Female)</option>
+            <option value="en-US-davis">Davis (US Male)</option>
+            <option value="en-GB-amelia">Amelia (UK Female)</option>
+            <option value="en-GB-oliver">Oliver (UK Male)</option>
+          </select>
+        </div>
+
+        <!-- LLM settings for conversation -->
+        <div class="conversation-settings">
+          <label for="conversationMaxTokens">Max Tokens:</label>
+          <input
+            type="number"
+            id="conversationMaxTokens"
+            value="800"
+            min="100"
+            max="3000"
+            style="width: 80px; margin: 0 10px"
+          />
+
+          <label for="conversationTemperature">Temperature:</label>
+          <input
+            type="number"
+            id="conversationTemperature"
+            value="0.7"
+            min="0"
+            max="2"
+            step="0.1"
+            style="width: 80px; margin: 0 10px"
+          />
+        </div>
+
+        <!-- Recording controls for conversation -->
+        <div class="conversation-controls">
+          <button id="startConversation" onclick="startConversationRecording()">
+            🎙️ Start Recording Question
+          </button>
+          <button
+            id="stopConversation"
+            onclick="stopConversationRecording()"
+            disabled
+          >
+            ⏹️ Stop & Get AI Response
+          </button>
+          <button
+            id="retryConversation"
+            onclick="retryConversation()"
+            disabled
+            style="display: none"
+          >
+            🔄 Retry Request
+          </button>
+        </div>
+
+        <!-- Conversation status -->
+        <div id="conversationStatus" class="status"></div>
+
+        <!-- Original question audio player -->
+        <audio
+          id="conversationAudioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+
+        <!-- AI Response Section -->
+        <div id="aiResponseSection" style="display: none; margin-top: 20px">
+          <h4>🤖 AI Response:</h4>
+          <div id="aiResponseText" class="ai-response-text"></div>
+          <div id="aiResponseAudio" class="ai-response-audio"></div>
+          <div
+            id="aiFallbackText"
+            class="ai-fallback-text"
+            style="display: none"
+          ></div>
+        </div>
+
+        <!-- Conversation results -->
+        <div
+          id="conversationResults"
+          class="conversation-results"
+          style="display: none"
+        >
+          <h3>💬 Conversation Details</h3>
+          <div
+            id="conversationTranscript"
+            class="conversation-transcript"
+          ></div>
+          <div id="conversationDetails" class="conversation-details"></div>
+        </div>
+      </div>
+
+      <!-- Error Log Section -->
+      <div class="section error-log-section" style="display: none">
+        <h2>📋 Error Log</h2>
+        <div id="errorLog" class="error-log">
+          <p>No errors recorded in this session.</p>
+        </div>
+        <button onclick="clearErrorLog()">🗑️ Clear Log</button>
+        <button onclick="toggleErrorLog()">👁️ Toggle Log</button>
+      </div>
+    </div>
+
+    <!-- Link to JS file -->
+    <script src="/static/script.js"></script>
+  </body>
+</html>

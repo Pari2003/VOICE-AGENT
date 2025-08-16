@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voice Agent -- Day 7</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>🎙️ Voice Agent -- Day 7</h1>
+      <p>
+        Playing back TTS audio using <em>Murf API</em>, uploading recorded audio
+        to server, transcribing with <em>AssemblyAI</em>, and
+        <strong>AI Echo Bot</strong>!<br />
+        <strong>Backend:</strong> FastAPI | <strong>Frontend:</strong> HTML +
+        CSS + JS
+      </p>
+
+      <!-- Text to Speech Section -->
+      <div class="section">
+        <h2>Text to Speech</h2>
+        <!-- Text input field -->
+        <input
+          type="text"
+          id="textInput"
+          placeholder="Enter text to convert to speech"
+        />
+
+        <!-- Voice selection -->
+        <select id="voiceSelect" class="voice-select">
+          <option value="en-US-natalie">Natalie (US Female)</option>
+          <option value="en-US-marcus">Marcus (US Male)</option>
+          <option value="en-US-charlotte">Charlotte (US Female)</option>
+          <option value="en-US-davis">Davis (US Male)</option>
+          <option value="en-GB-amelia">Amelia (UK Female)</option>
+          <option value="en-GB-oliver">Oliver (UK Male)</option>
+        </select>
+
+        <!-- Button to trigger fetch -->
+        <button onclick="generateAudio()">🔊 Generate Audio</button>
+
+        <!-- Audio player -->
+        <audio
+          id="audioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+      </div>
+
+      <!-- AI Echo Bot Section -->
+      <div class="section">
+        <h1>🤖 AI Echo Bot</h1>
+        <p>
+          Record your voice and hear it back in an AI voice! Your speech is
+          transcribed and converted to AI speech.
+        </p>
+
+        <!-- Voice selection for echo -->
+        <div class="echo-voice-selection">
+          <label for="echoVoiceSelect">Echo Voice:</label>
+          <select id="echoVoiceSelect" class="voice-select">
+            <option value="en-US-natalie">Natalie (US Female)</option>
+            <option value="en-US-marcus">Marcus (US Male)</option>
+            <option value="en-US-charlotte">Charlotte (US Female)</option>
+            <option value="en-US-davis">Davis (US Male)</option>
+            <option value="en-GB-amelia">Amelia (UK Female)</option>
+            <option value="en-GB-oliver">Oliver (UK Male)</option>
+          </select>
+        </div>
+
+        <!-- Recording controls -->
+        <div class="recording-controls">
+          <button id="startRecording" onclick="startRecording()">
+            🎙️ Start Recording
+          </button>
+          <button id="stopRecording" onclick="stopRecording()" disabled>
+            ⏹️ Stop Recording
+          </button>
+          <button id="aiEcho" onclick="aiEcho()" disabled style="display: none">
+            🤖 AI Echo
+          </button>
+          <button
+            id="uploadRecording"
+            onclick="uploadRecording()"
+            disabled
+            style="display: none"
+          >
+            📤 Upload Recording
+          </button>
+          <button
+            id="transcribeRecording"
+            onclick="transcribeRecording()"
+            disabled
+            style="display: none"
+          >
+            📝 Transcribe Audio
+          </button>
+        </div>
+
+        <!-- Recording status -->
+        <div id="recordingStatus" class="status"></div>
+
+        <!-- AI Echo status -->
+        <div id="aiEchoStatus" class="status"></div>
+
+        <!-- Upload status -->
+        <div id="uploadStatus" class="status"></div>
+
+        <!-- Transcription status -->
+        <div id="transcriptionStatus" class="status"></div>
+
+        <!-- Original audio player -->
+        <audio
+          id="recordedAudioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+
+        <!-- AI Echo audio player -->
+        <div id="echoAudioSection" style="display: none; margin-top: 20px">
+          <h4>🔊 AI Echo Result:</h4>
+          <audio id="echoAudioPlayer" controls style="width: 100%"></audio>
+        </div>
+
+        <!-- Upload info display -->
+        <div id="uploadInfo" class="upload-info" style="display: none">
+          <h3>📋 Upload Details</h3>
+          <div id="uploadDetails"></div>
+        </div>
+
+        <!-- Transcription results -->
+        <div
+          id="transcriptionResults"
+          class="transcription-results"
+          style="display: none"
+        >
+          <h3>📄 Transcription Results</h3>
+          <div id="transcriptionText" class="transcription-text"></div>
+          <div id="transcriptionDetails" class="transcription-details"></div>
+        </div>
+
+        <!-- AI Echo results -->
+        <div id="echoResults" class="echo-results" style="display: none">
+          <h3>🤖 AI Echo Results</h3>
+          <div id="echoTranscript" class="echo-transcript"></div>
+          <div id="echoDetails" class="echo-details"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link to JS file -->
+    <script src="/static/script.js"></script>
+  </body>
+</html>

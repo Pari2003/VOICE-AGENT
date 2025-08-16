@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voice Agent -- Day 8</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>🎙️ Voice Agent -- Day 8</h1>
+      <p>
+        Complete voice AI agent with TTS, transcription, AI Echo Bot, and
+        <strong>LLM text generation</strong> using Google Gemini!<br />
+        <strong>Backend:</strong> FastAPI | <strong>Frontend:</strong> HTML +
+        CSS + JS
+      </p>
+
+      <!-- Text to Speech Section -->
+      <div class="section">
+        <h2>Text to Speech</h2>
+        <!-- Text input field -->
+        <input
+          type="text"
+          id="textInput"
+          placeholder="Enter text to convert to speech"
+        />
+
+        <!-- Voice selection -->
+        <select id="voiceSelect" class="voice-select">
+          <option value="en-US-natalie">Natalie (US Female)</option>
+          <option value="en-US-marcus">Marcus (US Male)</option>
+          <option value="en-US-charlotte">Charlotte (US Female)</option>
+          <option value="en-US-davis">Davis (US Male)</option>
+          <option value="en-GB-amelia">Amelia (UK Female)</option>
+          <option value="en-GB-oliver">Oliver (UK Male)</option>
+        </select>
+
+        <!-- Button to trigger fetch -->
+        <button onclick="generateAudio()">🔊 Generate Audio</button>
+
+        <!-- Audio player -->
+        <audio
+          id="audioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+      </div>
+
+      <!-- LLM Query Section -->
+      <div class="section">
+        <h2>🧠 AI Text Generation</h2>
+        <p>Ask any question or give any prompt to Google Gemini AI!</p>
+
+        <!-- Query input -->
+        <textarea
+          id="llmQueryInput"
+          placeholder="Ask me anything or give me a task..."
+          rows="3"
+          style="
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+          "
+        ></textarea>
+
+        <!-- LLM settings -->
+        <div class="llm-settings">
+          <label for="maxTokens">Max Tokens:</label>
+          <input
+            type="number"
+            id="maxTokens"
+            value="1000"
+            min="100"
+            max="4000"
+            style="width: 80px; margin: 0 10px"
+          />
+
+          <label for="temperature">Temperature:</label>
+          <input
+            type="number"
+            id="temperature"
+            value="0.7"
+            min="0"
+            max="2"
+            step="0.1"
+            style="width: 80px; margin: 0 10px"
+          />
+        </div>
+
+        <!-- Generate button -->
+        <button onclick="generateLLMResponse()" style="margin-top: 10px">
+          ✨ Generate AI Response
+        </button>
+
+        <!-- LLM status -->
+        <div id="llmStatus" class="status"></div>
+
+        <!-- LLM results -->
+        <div id="llmResults" class="llm-results" style="display: none">
+          <h3>🤖 AI Response</h3>
+          <div id="llmResponse" class="llm-response"></div>
+          <div id="llmDetails" class="llm-details"></div>
+        </div>
+      </div>
+
+      <!-- AI Echo Bot Section -->
+      <div class="section">
+        <h2>🤖 AI Echo Bot</h2>
+        <p>
+          Record your voice and hear it back in an AI voice! Your speech is
+          transcribed and converted to AI speech.
+        </p>
+
+        <!-- Voice selection for echo -->
+        <div class="echo-voice-selection">
+          <label for="echoVoiceSelect">Echo Voice:</label>
+          <select id="echoVoiceSelect" class="voice-select">
+            <option value="en-US-natalie">Natalie (US Female)</option>
+            <option value="en-US-marcus">Marcus (US Male)</option>
+            <option value="en-US-charlotte">Charlotte (US Female)</option>
+            <option value="en-US-davis">Davis (US Male)</option>
+            <option value="en-GB-amelia">Amelia (UK Female)</option>
+            <option value="en-GB-oliver">Oliver (UK Male)</option>
+          </select>
+        </div>
+
+        <!-- Recording controls -->
+        <div class="recording-controls">
+          <button id="startRecording" onclick="startRecording()">
+            🎙️ Start Recording
+          </button>
+          <button id="stopRecording" onclick="stopRecording()" disabled>
+            ⏹️ Stop Recording
+          </button>
+          <button id="aiEcho" onclick="aiEcho()" disabled style="display: none">
+            🤖 AI Echo
+          </button>
+          <button
+            id="uploadRecording"
+            onclick="uploadRecording()"
+            disabled
+            style="display: none"
+          >
+            📤 Upload Recording
+          </button>
+          <button
+            id="transcribeRecording"
+            onclick="transcribeRecording()"
+            disabled
+            style="display: none"
+          >
+            📝 Transcribe Audio
+          </button>
+        </div>
+
+        <!-- Recording status -->
+        <div id="recordingStatus" class="status"></div>
+
+        <!-- AI Echo status -->
+        <div id="aiEchoStatus" class="status"></div>
+
+        <!-- Upload status -->
+        <div id="uploadStatus" class="status"></div>
+
+        <!-- Transcription status -->
+        <div id="transcriptionStatus" class="status"></div>
+
+        <!-- Original audio player -->
+        <audio
+          id="recordedAudioPlayer"
+          controls
+          style="display: none; margin-top: 15px"
+        ></audio>
+
+        <!-- AI Echo audio player -->
+        <div id="echoAudioSection" style="display: none; margin-top: 20px">
+          <h4>🔊 AI Echo Result:</h4>
+          <audio id="echoAudioPlayer" controls style="width: 100%"></audio>
+        </div>
+
+        <!-- Upload info display -->
+        <div id="uploadInfo" class="upload-info" style="display: none">
+          <h3>📋 Upload Details</h3>
+          <div id="uploadDetails"></div>
+        </div>
+
+        <!-- Transcription results -->
+        <div
+          id="transcriptionResults"
+          class="transcription-results"
+          style="display: none"
+        >
+          <h3>📄 Transcription Results</h3>
+          <div id="transcriptionText" class="transcription-text"></div>
+          <div id="transcriptionDetails" class="transcription-details"></div>
+        </div>
+
+        <!-- AI Echo results -->
+        <div id="echoResults" class="echo-results" style="display: none">
+          <h3>🤖 AI Echo Results</h3>
+          <div id="echoTranscript" class="echo-transcript"></div>
+          <div id="echoDetails" class="echo-details"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link to JS file -->
+    <script src="/static/script.js"></script>
+  </body>
+</html>

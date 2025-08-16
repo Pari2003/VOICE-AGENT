@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#6366f1">
+    <title>Voice Agent - Day 12</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="app-title">
+                    <i class="fas fa-microphone-alt"></i>
+                    <h1>Voice Agent</h1>
+                    <span class="version">v12.0</span>
+                </div>
+                <div class="connection-status">
+                    <div id="connectionIndicator" class="connection-indicator">
+                        <i class="fas fa-circle"></i>
+                        <span>Connecting...</span>
+                    </div>
+                    <div id="lastUpdate" class="last-update">
+                        Last update: --:--
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Chat Interface -->
+        <main class="chat-container">
+            <!-- Session Info -->
+            <div class="session-info">
+                <div class="session-details">
+                    <span class="session-label">Session:</span>
+                    <span id="sessionDisplay" class="session-id">Loading...</span>
+                </div>
+                <div class="session-actions">
+                    <button class="btn-secondary" onclick="generateNewSession()">
+                        <i class="fas fa-plus"></i> New Chat
+                    </button>
+                    <button class="btn-secondary" onclick="clearCurrentSession()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat History -->
+            <div id="chatHistory" class="chat-history">
+                <div id="chatMessages" class="chat-messages">
+                    <!-- Messages will be populated here -->
+                </div>
+            </div>
+
+            <!-- Status Display -->
+            <div id="statusDisplay" class="status-display">
+                <div id="statusMessage" class="status-message">
+                    <i class="fas fa-circle-notch fa-spin" style="display: none;"></i>
+                    <span>Ready to start conversation</span>
+                </div>
+                <div id="statusSubtext" class="status-subtext">
+                    Press and hold the microphone button to speak
+                </div>
+            </div>
+
+            <!-- Recording Interface -->
+            <div class="recording-interface">
+                <!-- Main Record Button -->
+                <div class="record-button-container">
+                    <button id="recordButton" class="record-button" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">
+                        <div class="record-button-inner">
+                            <i id="recordIcon" class="fas fa-microphone"></i>
+                        </div>
+                        <div class="record-button-pulse"></div>
+                    </button>
+                    <div class="record-button-label">
+                        <span id="recordLabel">Hold to Speak</span>
+                    </div>
+                </div>
+
+                <!-- Alternative Controls -->
+                <div class="alternative-controls">
+                    <button id="toggleConversation" class="btn-toggle" onclick="toggleConversationMode()">
+                        <i class="fas fa-comments"></i>
+                        <span>Conversation Mode</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Panel -->
+            <div class="settings-panel">
+                <div class="settings-row">
+                    <label for="voiceSelect">Voice:</label>
+                    <select id="voiceSelect" class="voice-select">
+                        <option value="en-US-natalie">Natalie (US English)</option>
+                        <option value="en-US-greg">Greg (US English)</option>
+                        <option value="en-US-ashley">Ashley (US English)</option>
+                        <option value="en-GB-monica">Monica (British English)</option>
+                        <option value="en-AU-jenna">Jenna (Australian English)</option>
+                    </select>
+                </div>
+                <div class="settings-row">
+                    <label for="creativitySlider">Creativity:</label>
+                    <div class="slider-container">
+                        <input type="range" id="creativitySlider" min="0" max="1" step="0.1" value="0.7" class="slider">
+                        <span id="creativityValue" class="slider-value">0.7</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- AI Response Section -->
+        <div id="responseSection" class="response-section">
+            <div class="response-header">
+                <h3><i class="fas fa-robot"></i> AI Response</h3>
+                <div class="response-actions">
+                    <button class="btn-icon" onclick="copyResponse()" title="Copy Response">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="btn-icon" onclick="shareResponse()" title="Share Response">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="responseContent" class="response-content">
+                <div id="responseText" class="response-text">
+                    <!-- AI response text will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="error-alert">
+            <div class="error-content">
+                <div class="error-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Connection Issue</span>
+                    <button class="error-close" onclick="dismissError()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="errorDetails" class="error-details">
+                    <!-- Error details will appear here -->
+                </div>
+                <div class="error-actions">
+                    <button class="btn-primary" onclick="retryLastAction()">
+                        <i class="fas fa-redo"></i> Retry
+                    </button>
+                    <button class="btn-secondary" onclick="showDiagnostics()">
+                        <i class="fas fa-tools"></i> Diagnostics
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnostics Panel -->
+        <div id="diagnosticsPanel" class="diagnostics-panel">
+            <div class="diagnostics-header">
+                <h3><i class="fas fa-stethoscope"></i> System Diagnostics</h3>
+                <button class="btn-icon" onclick="hideDiagnostics()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="diagnostics-content">
+                <div class="diagnostics-status">
+                    <div class="status-item">
+                        <span class="status-label">Network:</span>
+                        <span id="networkStatus" class="status-value">Testing...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Speech Recognition:</span>
+                        <span id="sttStatus" class="status-value">Testing...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">AI Model:</span>
+                        <span id="llmStatus" class="status-value">Testing...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Text-to-Speech:</span>
+                        <span id="ttsStatus" class="status-value">Testing...</span>
+                    </div>
+                </div>
+                <div class="diagnostics-actions">
+                    <button class="btn-primary" onclick="runFullDiagnostics()">
+                        <i class="fas fa-play"></i> Run Tests
+                    </button>
+                    <button class="btn-secondary" onclick="exportDiagnostics()">
+                        <i class="fas fa-download"></i> Export Results
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner">
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                </div>
+                <div id="loadingText" class="loading-text">Processing your message...</div>
+                <div id="loadingSubtext" class="loading-subtext">This may take a few moments</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <span>Day 12 - Revamped UI</span>
+                    <span class="footer-separator">•</span>
+                    <span>Powered by AI</span>
+                </div>
+                <div class="footer-right">
+                    <button id="darkModeToggle" class="btn-icon" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="btn-icon" onclick="toggleSettings()" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="btn-icon" onclick="showHelp()" title="Help">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="audioPlayer" style="display: none;" controls></audio>
+
+    <script src="{{ url_for('static', path='script.js') }}"></script>
+</body>
+</html>
